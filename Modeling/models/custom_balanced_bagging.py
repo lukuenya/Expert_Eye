@@ -9,7 +9,7 @@ class CustomImblearnBalancedBagging(BaseEstimator, ClassifierMixin):
         self.estimator = estimator
         self.n_estimators = n_estimators
         self.random_state = random_state
-        self.balanced_bagging = BalancedBaggingClassifier(estimator=self.base_estimator,
+        self.balanced_bagging = BalancedBaggingClassifier(estimator=self.estimator,
                                                           n_estimators=self.n_estimators,
                                                           random_state=self.random_state)
 
