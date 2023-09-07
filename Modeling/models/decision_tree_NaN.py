@@ -194,8 +194,10 @@ class DecisionTree(ABC):
             # set the node value & return
             node.leaf_value = self._leaf_value(D)
             return
+        
+    def __traverse(self, node: Node, Xrow: np.array) -> dict:
+    # 1rst version : def __traverse(self, node: Node, Xrow: np.array) -> int | float:
 
-    def __traverse(self, node: Node, Xrow: np.array) -> int | float:
         """
         Private recursive function to traverse the (trained) tree
 
@@ -203,7 +205,8 @@ class DecisionTree(ABC):
             node -> current node in the tree
             Xrow -> data sample being considered
         Output:
-            leaf value corresponding to Xrow
+            1rst version: leaf value corresponding to Xrow
+            2nd version: leaf value (class frequencies) corresponding to Xrow
         """
         # check if we're in a leaf node?
         if node.leaf_value is None:
@@ -254,6 +257,27 @@ class DecisionTree(ABC):
             p.append(self.__traverse(self.tree, Xin[r, :]))
         # return predictions
         return (np.array(p).flatten())
+    
+    def predict_proba(self, Xin: np.array) -> np.array:
+        """
+        Make probability predictions from the trained CART model
+
+        Input:
+            Xin -> input set of predictor features
+        Output:
+            array of class probabilities
+        """
+        Xin[Xin == None] = np.nan
+        Xin = Xin.astype('float64')
+
+        probas = []
+        for r in range(Xin.shape[0]):
+            proba = self.__traverse(self.tree, Xin[r, :])
+            # Assuming proba is the probability of the positive class
+            probas.append([1 - proba, proba])
+            
+        return np.array(probas)
+
 
 
 class DecisionTreeClassifier(DecisionTree):
@@ -342,6 +366,11 @@ class DecisionTreeClassifier(DecisionTree):
         Input:
             D -> data to compute the leaf value
         Output:
-            Mode of D         
+            Mode of D -> 1rst version (Commented))   
+            Dictionary of classe frequencies -> 2nd version (Uncommented)      
         """
-        return (stats.mode(D[:, -1], nan_policy='omit')[0])
+        #return (stats.mode(D[:, -1], nan_policy='omit')[0])
+
+        unique, counts = np.unique(D[:, -1], return_counts=True)
+        total = counts.sum()
+        return {k: v/total for k, v in zip(unique, counts)}
