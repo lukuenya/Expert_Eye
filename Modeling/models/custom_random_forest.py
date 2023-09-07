@@ -39,17 +39,6 @@ class CustomRandomForest:
             x.astype('int')).argmax(), axis=1, arr=tree_preds)
 
         return y_pred
-    
-    def predict_proba(self, X):
-        probas = np.zeros((X.shape[0], 2))
-
-        for tree in self.trees:
-            probas += tree.predict_proba(X)
-
-        # Average the probabilities
-        probas /= self.n_estimators
-
-        return probas
         
 
     def get_metrics(self, y_true, y_pred):

@@ -14,9 +14,6 @@ class CustomDecisionTree:
 
     def predict(self, X):
         return self.dt_model.predict(X)
-    
-    def predict_proba(self, X):
-        return self.dt_model.predict_proba(X)
 
     def get_metrics(self, y_true, y_pred):
         idx = ~np.isnan(y_true)
