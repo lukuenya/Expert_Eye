@@ -345,4 +345,8 @@ class DecisionTreeClassifier(DecisionTree):
         Output:
             Mode of D -> 1rst version (Commented))         
         """
-        return (stats.mode(D[:, -1], nan_policy='omit')[0])
+        #return (stats.mode(D[:, -1], nan_policy='omit')[0])
+
+        unique, counts = np.unique(D[:, -1], return_counts=True)
+        total = counts.sum()
+        return {k: v/total for k, v in zip(unique, counts)}
