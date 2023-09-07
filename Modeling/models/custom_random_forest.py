@@ -1,47 +1,56 @@
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.utils import resample
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.metrics import confusion_matrix, roc_auc_score, f1_score
+from custom_decision_tree import CustomDecisionTree
 
 
-class CustomBaggingClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self, estimator, n_estimators=10, random_state=None):
-        self.estimator = estimator
+class CustomRandomForest:
+
+    def __init__(self, n_estimators=100, max_depth=None, min_samples_split=2, random_state=None):
         self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
         self.random_state = random_state
-        self.estimators_ = []
+        self.trees = []
 
     def fit(self, X, y):
         np.random.seed(self.random_state)
-        self.estimators_ = []
 
         for _ in range(self.n_estimators):
-            # Bootstrap resampling
-            X_sample, y_sample = resample(X, y)
+            # Bootstrap sampling
+            indices = np.random.choice(len(X), len(X), replace=True)
+            X_sample = X[indices]
+            y_sample = y[indices]
 
-            # Clone and fit the base estimator
-            estimator = self._clone_and_fit(X_sample, y_sample)
-            self.estimators_.append(estimator)
-
-        return self
-
-    def _clone_and_fit(self, X, y):
-        estimator = self.estimator
-        estimator.fit(X, y)
-        return estimator
+            # Create a tree and fit it
+            tree = CustomDecisionTree(
+                max_depth=self.max_depth, min_samples_split=self.min_samples_split)
+            tree.fit(X_sample, y_sample)
+            self.trees.append(tree)
 
     def predict(self, X):
-        # Generate predictions from each estimator
-        predictions = np.zeros((X.shape[0], len(self.estimators_)))
-        for i, estimator in enumerate(self.estimators_):
-            predictions[:, i] = estimator.predict(X)
+        tree_preds = np.zeros((X.shape[0], len(self.trees)))
 
-        # Aggregate predictions to generate final prediction
+        for i, tree in enumerate(self.trees):
+            tree_preds[:, i] = tree.predict(X)
+
+        # Majority voting
         y_pred = np.apply_along_axis(lambda x: np.bincount(
-            x).argmax(), axis=1, arr=predictions.astype(int))
+            x.astype('int')).argmax(), axis=1, arr=tree_preds)
 
         return y_pred
+    
+    def predict_proba(self, X):
+        probas = np.zeros((X.shape[0], 2))
+
+        for tree in self.trees:
+            probas += tree.predict_proba(X)
+
+        # Average the probabilities
+        probas /= self.n_estimators
+
+        return probas
+        
 
     def get_metrics(self, y_true, y_pred):
         idx = ~np.isnan(y_true)
@@ -65,4 +74,3 @@ class CustomBaggingClassifier(BaseEstimator, ClassifierMixin):
         print('='*30)
 
         return metrics
-
