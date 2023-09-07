@@ -1,0 +1,13 @@
+{"ListVariables": [
+{"Variable": "Score YF" , "Values": [98,0]},
+{"Variable": "Score YO" , "Values": [98,0]},
+{"Variable": "Surface YF" , "Values": [1.9710448202841597,0]},
+{"Variable": "Surface YO" , "Values": [0.6435488306207094,0]},
+{"Variable": "Sway Density YF" , "Values": [29.880000000000003,0]},
+{"Variable": "Sway Density YO" , "Values": [29.880000000000003,0]},
+{"Variable": "Variance Latérale YF" , "Values": [0.003033791456668357,0]},
+{"Variable": "Variance Latérale YO" , "Values": [0.0007159644329021105,0]},
+{"Variable": "Vitesse Moyenne YF" , "Values": [1.2831877833321867,0]},
+{"Variable": "Vitesse Moyenne YO" , "Values": [0.8047863857930792,0]}
+]
+}
