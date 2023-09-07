@@ -4,25 +4,24 @@ from decision_tree_NaN import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 import numpy as np
 
+
 class CustomDecisionTree:
 
     def __init__(self, max_depth=None, min_samples_split=2, nans_go_right=True, loss='gini'):
-        self.dt_model = DecisionTreeClassifier(max_depth=max_depth, min_samples_split=min_samples_split, nans_go_right=nans_go_right, loss=loss)
+        self.dt_model = DecisionTreeClassifier(
+            max_depth=max_depth, min_samples_split=min_samples_split, nans_go_right=nans_go_right, loss=loss)
 
     def fit(self, X_train, y_train):
         self.dt_model.train(X_train, y_train)
 
     def predict(self, X):
         return self.dt_model.predict(X)
-    
-    def predict_proba(self, X):
-        return self.dt_model.predict_proba(X)
 
     def get_metrics(self, y_true, y_pred):
         idx = ~np.isnan(y_true)
         y_true = y_true[idx]
         y_pred = y_pred[idx]
-        
+
         metrics = {
             "accuracy": accuracy_score(y_true, y_pred),
             "precision": precision_score(y_true, y_pred),

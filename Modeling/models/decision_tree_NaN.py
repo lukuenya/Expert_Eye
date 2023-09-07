@@ -255,7 +255,7 @@ class DecisionTree(ABC):
             p.append(self.__traverse(self.tree, Xin[r, :]))
         # return predictions
         return (np.array(p).flatten())
-    
+
 
 class DecisionTreeClassifier(DecisionTree):
     """
@@ -343,10 +343,6 @@ class DecisionTreeClassifier(DecisionTree):
         Input:
             D -> data to compute the leaf value
         Output:
-            Mode of D -> 1rst version (Commented))         
+            Mode of D         
         """
-        #return (stats.mode(D[:, -1], nan_policy='omit')[0])
-
-        unique, counts = np.unique(D[:, -1], return_counts=True)
-        total = counts.sum()
-        return {k: v/total for k, v in zip(unique, counts)}
+        return (stats.mode(D[:, -1], nan_policy='omit')[0])
