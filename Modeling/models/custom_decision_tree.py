@@ -7,9 +7,15 @@ import numpy as np
 
 class CustomDecisionTree:
 
-    def __init__(self, max_depth=None, min_samples_split=2, nans_go_right=True, loss='gini'):
+    def __init__(self, max_depth=None, min_samples_split=2, nans_go_right=True, loss='gini', max_features=0.5, class_weight='balanced'):
+        
         self.dt_model = DecisionTreeClassifier(
-            max_depth=max_depth, min_samples_split=min_samples_split, nans_go_right=nans_go_right, loss=loss)
+            max_depth=max_depth, 
+            min_samples_split=min_samples_split, 
+            nans_go_right=nans_go_right, 
+            loss=loss, 
+            max_features=max_features, 
+            class_weight=class_weight)
 
     def fit(self, X_train, y_train):
         self.dt_model.train(X_train, y_train)

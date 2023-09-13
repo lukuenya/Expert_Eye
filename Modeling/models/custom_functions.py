@@ -2,6 +2,7 @@
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
 import pandas as pd
 from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
@@ -83,6 +84,7 @@ def cvbknn_imputer(X, n_splits, k_values=[], verbose=False):
 
     return X_imputed, best_k
 
+
 def processing(X, n_splits=5, k_values=[1, 3, 5, 7, 9, 11], verbose=False):
     """
     Perform impuation on the data
@@ -100,7 +102,7 @@ def processing(X, n_splits=5, k_values=[1, 3, 5, 7, 9, 11], verbose=False):
     imputed_data_original_scale = scaler.inverse_transform(X_imputed_scaled)
 
     # return imputed_data_original_scale as a dataframe
-    return pd.DataFrame(imputed_data_original_scale)
+    return imputed_data_original_scale, best_k
 
 #------------------------------------------------------------------------------------------
 
@@ -141,9 +143,30 @@ def handle_class_imbalance(dataset):
 
 # Splitting the data into train and test sets
 def split_data(df):
-  X = df.drop(['Frailty_State'], axis=1).values
+  X = df.drop(['Frailty_State', 'Frailty_Score'], axis=1).values
   y = df['Frailty_State'].values
 
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
   return X_train, X_test, y_train, y_test
+
+def cross_val_data(df, n_splits=5):
+    X = df.drop(['Frailty_State', 'Frailty_Score'], axis=1).values
+    y = df['Frailty_State'].values
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        yield X_train, X_test, y_train, y_test
+
+
+def cross_val_data_reg(df, n_splits=5):
+    X = df.drop(['Frailty_State', 'Frailty_Score'], axis=1).values
+    y = df['Frailty_Score'].values
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        yield X_train, X_test, y_train, y_test

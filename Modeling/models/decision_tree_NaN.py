@@ -1,4 +1,3 @@
-
 # imports
 from __future__ import annotations
 import pandas as pd
@@ -6,18 +5,18 @@ import numpy as np
 from typing import Tuple
 from abc import ABC, abstractmethod
 from scipy import stats
+
 from random import choices
 import numpy as np
-
+from math import floor
+from random import sample
 
 # Decision Tree Classifier
-
 
 class Node(object):
     """
     Class to define & control tree nodes
     """
-
     def __init__(self) -> None:
         """
         Initializer for a Node class instance
@@ -77,13 +76,12 @@ class Node(object):
         """
         return (self.__right)
 
-
 class DecisionTree(ABC):
     """
     Base class to encompass the CART algorithm
     """
 
-    def __init__(self, max_depth: int = None, min_samples_split: int = 2, nans_go_right=True) -> None:
+    def __init__(self, max_depth: int = None, min_samples_split: int = 2, nans_go_right=True, max_features=None) -> None:
         """
         Initializer
 
@@ -96,6 +94,7 @@ class DecisionTree(ABC):
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.nans_go_right = nans_go_right
+        self.max_features = max_features
 
     @abstractmethod
     def _impurity(self, D: np.array) -> None:
@@ -153,6 +152,17 @@ class DecisionTree(ABC):
         # not a leaf node
         if depth and msamp and n_cls:
 
+            #  max_features logic here
+            if self.max_features is not None:
+                if isinstance(self.max_features, float):
+                    n_features = floor((D.shape[1] - 1) * self.max_features)
+                else:
+                    n_features = self.max_features
+                available_features = list(range(D.shape[1]-1))
+                selected_features = sample(available_features, min(n_features, len(available_features)))
+            else:
+                selected_features = range(D.shape[1]-1)
+
             # initialize the function parameters
             ip_node = None
             feature = None
@@ -160,7 +170,8 @@ class DecisionTree(ABC):
             left_D = None
             right_D = None
             # iterate through the possible feature/split combinations
-            for f in range(D.shape[1]-1):
+            for f in selected_features:
+
                 f_values = D[:, f]
                 for s in np.unique(f_values[~np.isnan(f_values)]):
                     # for the current (f,s) combination, split the dataset
@@ -178,12 +189,15 @@ class DecisionTree(ABC):
                             split = s
                             left_D = D_l
                             right_D = D_r
+
             # set the current node's parameters
             node.set_params(split, feature)
+
             # declare child nodes
             left_node = Node()
             right_node = Node()
             node.set_children(left_node, right_node)
+
             # investigate child nodes
             self.__grow(node.get_left_node(), left_D, level+1)
             self.__grow(node.get_right_node(), right_D, level+1)
@@ -225,15 +239,25 @@ class DecisionTree(ABC):
         Train the CART model
 
         Inputs:
-            Xin -> input set of predictor features
-            Yin -> input set of labels
+            #Xin -> input set of predictor features
+            #Yin -> input set of labels
         """
         # prepare the input data
         D = np.concatenate((Xin, Yin.reshape(-1, 1)), axis=1)
         D[D == None] = np.nan
         D = D.astype('float64')
+
+        # Calculate class weights (balanced)
+        if self.class_weight == 'balanced':
+            unique_classes, counts = np.unique(Yin, return_counts=True)
+            n_samples = len(Yin)
+            n_classes = len(unique_classes)
+            self.class_weight = {cls: n_samples / (n_classes * count) for cls, count in zip(unique_classes, counts)}
+            #self.class_weight = {cls: n_samples / count for cls, count in zip(unique_classes, counts)}
+
         # set the root node of the tree
         self.tree = Node()
+
         # build the tree
         self.__grow(self.tree, D, 1)
 
@@ -262,19 +286,32 @@ class DecisionTreeClassifier(DecisionTree):
     Decision Tree Classifier
     """
 
-    def __init__(self, max_depth: int = None, min_samples_split: int = 2, nans_go_right=True, loss: str = 'gini') -> None:
-        """
-        Initializer
+    # def __init__(self, max_depth: int = None, min_samples_split: int = 2, nans_go_right=True, loss: str = 'gini') -> None:
+        #"""
+        #Initializer
 
-        Inputs:
-            max_depth         -> maximum depth the tree can grow
-            min_samples_split -> minimum number of samples required to split a node
-            nans_go_right     -> boolean to determine where NaN values in predictors are allocated
-            loss              -> loss function to use during training
-        """
-        DecisionTree.__init__(
-            self, max_depth, min_samples_split, nans_go_right)
+        #Inputs:
+           # max_depth         -> maximum depth the tree can grow
+            #min_samples_split -> minimum number of samples required to split a node
+            #nans_go_right     -> boolean to determine where NaN values in predictors are allocated
+            #loss              -> loss function to use during training
+        #"""
+        #DecisionTree.__init__(
+            #self, max_depth, min_samples_split, nans_go_right)
+        #self.loss = loss
+
+    def __init__(self, 
+                 max_depth: int = None, 
+                 min_samples_split: int = 2, 
+                 nans_go_right=True, 
+                 loss: str = 'gini', 
+                 class_weight: dict = None, 
+                 max_features=None) -> None: 
+        
+        super().__init__(max_depth, min_samples_split, nans_go_right, max_features)  
         self.loss = loss
+        self.class_weight = class_weight if class_weight else {}
+
 
     def __gini(self, D: np.array) -> float:
         """
@@ -285,19 +322,24 @@ class DecisionTreeClassifier(DecisionTree):
         Output:
             Gini impurity for D
         """
-        # initialize the output
         G = 0
         # iterate through the unique classes
         cls = D[:, -1]
         for c in np.unique(cls[~np.isnan(cls)]):
+
             # compute p for the current c
-            p = D[D[:, -1] == c].shape[0]/D.shape[0]
-            # compute term for the current c
-            G += p*(1-p)
+            p = D[D[:, -1] == c].shape[0] / D.shape[0]
+            w = self.class_weight.get(c, 1) 
+
+            # compute term for the current c multiplied by the class weight
+            G += w * p * (1 - p)  
         # return gini impurity
-        return (G)
+        return G
+
+
 
     def __entropy(self, D: np.array) -> float:
+
         """
         Private function to define the shannon entropy
 
@@ -310,13 +352,17 @@ class DecisionTreeClassifier(DecisionTree):
         H = 0
         # iterate through the unique classes
         cls = D[:, -1]
+
         for c in np.unique(cls[~np.isnan(cls)]):
+
             # compute p for the current c
-            p = D[D[:, -1] == c].shape[0]/D.shape[0]
-            # compute term for the current c
-            H -= p*np.log2(p)
+            p = D[D[:, -1] == c].shape[0] / D.shape[0]
+
+            # compute term for the current c multiplied by the class weight
+            w = self.class_weight.get(c, 1)  
+            H -= w * p * np.log2(p)  
         # return entropy
-        return (H)
+        return H
 
     def _impurity(self, D: np.array) -> float:
         """
@@ -344,5 +390,5 @@ class DecisionTreeClassifier(DecisionTree):
             D -> data to compute the leaf value
         Output:
             Mode of D         
-        """
-        return (stats.mode(D[:, -1], nan_policy='omit')[0])
+        """ 
+        return (stats.mode(D[:, -1], keepdims=False, nan_policy='omit')[0])

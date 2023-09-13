@@ -5,8 +5,8 @@ from sklearn.metrics import confusion_matrix, roc_auc_score, f1_score
 
 class CustomHGBoosting:
     
-    def __init__(self):
-        self.hgboost_model = HistGradientBoostingClassifier()
+    def __init__(self, **kwargs):
+        self.hgboost_model = HistGradientBoostingClassifier(**kwargs)
 
     def fit(self, X_train, y_train):
         self.hgboost_model.fit(X_train, y_train)
@@ -16,6 +16,16 @@ class CustomHGBoosting:
 
     def predict_proba(self, X):
         return self.hgboost_model.predict_proba(X)
+    
+    def get_feature_importances(self):
+        return self.hgboost_model.feature_importances_
+
+    def get_params(self, deep=True):
+        return self.hgboost_model.get_params(deep)
+
+    def set_params(self, **parameters):
+        self.hgboost_model.set_params(**parameters)
+        return self
 
     def get_metrics(self, y_true, y_pred):
         idx = ~np.isnan(y_true)

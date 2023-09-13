@@ -10,7 +10,8 @@ class CustomLightGBM:
             self.params = {
                 'objective': 'binary',
                 'metric': 'binary_error',
-                'boosting_type': 'gbdt'
+                'boosting_type': 'gbdt',
+                'random_state': 42,
             }
         else:
             self.params = params

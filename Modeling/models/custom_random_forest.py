@@ -6,15 +6,24 @@ from custom_decision_tree import CustomDecisionTree
 
 class CustomRandomForest:
 
-    def __init__(self, n_estimators=100, max_depth=None, min_samples_split=2, random_state=None):
+    def __init__(self, n_estimators=100, max_depth=None, min_samples_split=2, max_features=0.7, class_weight='balanced', random_state=42):
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.max_features = max_features
+        self.class_weight = class_weight
         self.random_state = random_state
         self.trees = []
 
     def fit(self, X, y):
         np.random.seed(self.random_state)
+
+        if self.class_weight == 'balanced':
+            unique_classes, counts = np.unique(y, return_counts=True)
+            n_samples = len(y)
+            n_classes = len(unique_classes)
+            self.class_weight = {cls: n_samples / (n_classes * count) 
+                                for cls, count in zip(unique_classes, counts)}
 
         for _ in range(self.n_estimators):
             # Bootstrap sampling
@@ -24,8 +33,11 @@ class CustomRandomForest:
 
             # Create a tree and fit it
             tree = CustomDecisionTree(
-                max_depth=self.max_depth, min_samples_split=self.min_samples_split)
+                max_depth=self.max_depth, 
+                min_samples_split=self.min_samples_split, class_weight=self.class_weight, max_features=self.max_features)
+            
             tree.fit(X_sample, y_sample)
+
             self.trees.append(tree)
 
     def predict(self, X):
@@ -39,6 +51,20 @@ class CustomRandomForest:
             x.astype('int')).argmax(), axis=1, arr=tree_preds)
 
         return y_pred
+
+    def get_params(self, deep=True):
+        return {
+            "n_estimators": self.n_estimators,
+            "max_depth": self.max_depth,
+            "min_samples_split": self.min_samples_split,
+            "random_state": self.random_state,
+            "class_weight": self.class_weight
+        }
+
+    def set_params(self, **parameters):
+        for parameter, value in parameters.items():
+            setattr(self, parameter, value)
+        return self
 
     def get_metrics(self, y_true, y_pred):
         idx = ~np.isnan(y_true)
