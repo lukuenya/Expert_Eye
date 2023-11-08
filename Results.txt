@@ -1,0 +1,90 @@
+Metrics for Original Models:
+Model: DecisionTree
+Average f1_score: 0.7584509961773119, Std Dev: 0.06045114954632977
+Average rec_score: 0.7631578947368421, Std Dev: 0.07487293021293048
+Average roc_auc_score: 0.6947619047619047, Std Dev: 0.02859126295672021
+Best Parameters:
+{'criterion': 'gini', 'max_depth': 6, 'max_features': 'sqrt'}
+{'criterion': 'gini', 'max_depth': 3, 'max_features': 'sqrt'}
+{'criterion': 'gini', 'max_depth': 6, 'max_features': 'log2'}
+{'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt'}
+{'criterion': 'entropy', 'max_depth': 6, 'max_features': 'log2'}
+==============================
+Model: XGBoost
+Average f1_score: 0.714725084401772, Std Dev: 0.0956156217146882
+Average rec_score: 0.7310526315789474, Std Dev: 0.09648245574159056
+Average roc_auc_score: 0.7347619047619047, Std Dev: 0.1314665231609102
+Best Parameters:
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 4, 'n_estimators': 30}
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 50}
+{'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 4, 'n_estimators': 30}
+{'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 30}
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 30}
+==============================
+Model: RandomForest
+Average f1_score: 0.6676490994607444, Std Dev: 0.07235842148222003
+Average rec_score: 0.7215789473684211, Std Dev: 0.057305615065240685
+Average roc_auc_score: 0.735, Std Dev: 0.14804948765075415
+Best Parameters:
+{'bootstrap': False, 'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 30}
+{'bootstrap': False, 'criterion': 'gini', 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 50}
+{'bootstrap': True, 'criterion': 'gini', 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 100}
+{'bootstrap': False, 'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 30}
+{'bootstrap': True, 'criterion': 'entropy', 'max_depth': 5, 'max_features': 'log2', 'n_estimators': 100}
+==============================
+Model: LightGBM
+Average f1_score: 0.7110779277169564, Std Dev: 0.0610019309810121
+Average rec_score: 0.7321052631578947, Std Dev: 0.04170865843401885
+Average roc_auc_score: 0.7734285714285714, Std Dev: 0.06346602640733476
+Best Parameters:
+{'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 100}
+{'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 100}
+{'learning_rate': 0.2, 'max_depth': 3, 'n_estimators': 100}
+{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 50}
+{'learning_rate': 0.2, 'max_depth': 3, 'n_estimators': 100}
+==============================
+Metrics for Retrained Models:
+Model: DecisionTree
+Average f1_score: 0.5709714145503619, Std Dev: 0.12840545963369454
+Average rec_score: 0.5573684210526315, Std Dev: 0.1325542798973823
+Average roc_auc_score: 0.47119047619047616, Std Dev: 0.1372108379792096
+Best Parameters:
+{'criterion': 'gini', 'max_depth': 10, 'max_features': 'log2'}
+{'criterion': 'gini', 'max_depth': 3, 'max_features': 'log2'}
+{'criterion': 'gini', 'max_depth': 3, 'max_features': 'sqrt'}
+{'criterion': 'entropy', 'max_depth': 10, 'max_features': 'log2'}
+{'criterion': 'gini', 'max_depth': 6, 'max_features': 'sqrt'}
+==============================
+Model: XGBoost
+Average f1_score: 0.776292018796556, Std Dev: 0.0931642391661093
+Average rec_score: 0.783157894736842, Std Dev: 0.0865345430843337
+Average roc_auc_score: 0.8120952380952381, Std Dev: 0.08551670349097727
+Best Parameters:
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 30}
+{'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 100}
+{'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 100}
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 30}
+{'learning_rate': 0.1, 'max_depth': 3, 'min_child_weight': 2, 'n_estimators': 50}
+==============================
+Model: RandomForest
+Average f1_score: 0.6469917324469532, Std Dev: 0.06016107379895689
+Average rec_score: 0.7121052631578947, Std Dev: 0.03820777139554005
+Average roc_auc_score: 0.7321904761904762, Std Dev: 0.05773267033915713
+Best Parameters:
+{'bootstrap': True, 'criterion': 'gini', 'max_depth': 5, 'max_features': 'sqrt', 'n_estimators': 30}
+{'bootstrap': False, 'criterion': 'gini', 'max_depth': 10, 'max_features': 'log2', 'n_estimators': 50}
+{'bootstrap': True, 'criterion': 'gini', 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 100}
+{'bootstrap': False, 'criterion': 'gini', 'max_depth': 5, 'max_features': 'sqrt', 'n_estimators': 50}
+{'bootstrap': True, 'criterion': 'gini', 'max_depth': 5, 'max_features': 'sqrt', 'n_estimators': 50}
+==============================
+Model: LightGBM
+Average f1_score: 0.8028994529334088, Std Dev: 0.12868766626788222
+Average rec_score: 0.8126315789473684, Std Dev: 0.12246600523277112
+Average roc_auc_score: 0.7824761904761904, Std Dev: 0.1368425945808175
+Best Parameters:
+{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 50}
+{'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100}
+{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100}
+{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100}
+==============================
